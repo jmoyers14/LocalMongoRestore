@@ -11,5 +11,10 @@
   "type": "module",
   "scripts": {
     "go": "NODE_NO_WARNINGS=1 node --loader @esbuild-kit/esm-loader"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "dotenv": "^16.4.5",
+    "yargs": "^17.7.2"
   }
 }
