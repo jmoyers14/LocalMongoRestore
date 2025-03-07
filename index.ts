@@ -3,6 +3,7 @@ import { hideBin } from "yargs/helpers";
 import { dump } from "./commands/dump";
 import { restore } from "./commands/restore";
 import { restoreRemote } from "./commands/restoreRemote";
+import { save } from "./commands/save";
 import "dotenv/config";
 
 yargs(hideBin(process.argv))
@@ -18,9 +19,17 @@ yargs(hideBin(process.argv))
                 type: "array",
                 description: "Collection names to restore",
             },
+            save: {
+                alias: "s",
+                type: "string",
+                description: "Name of the saved state to restore from",
+            },
         },
         async (argv) => {
-            await restore(argv.collection);
+            await restore({
+                collectionNames: argv.collection,
+                saveName: argv.save,
+            });
         }
     )
     .command(
@@ -36,6 +45,21 @@ yargs(hideBin(process.argv))
         },
         async (argv) => {
             await restoreRemote(argv.collection);
+        }
+    )
+    .command(
+        "save",
+        "Save current database state",
+        {
+            name: {
+                alias: "n",
+                type: "string",
+                description: "Name for this saved state",
+                demandOption: true,
+            },
+        },
+        async (argv) => {
+            await save(argv.name);
         }
     )
     .demandCommand(1)

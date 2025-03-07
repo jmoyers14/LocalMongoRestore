@@ -2,9 +2,20 @@ import { getLocalConnectionString } from "../config/database";
 import { spawnWithLogs } from "../utils/spawn";
 import { DUMP_PATH } from "../config/constants";
 import chalk from "chalk";
+import path from "node:path";
 
-export const restore = async (collectionNames?: string[]) => {
+export type RestoreOptions = {
+    collectionNames?: string[];
+    saveName?: string;
+};
+
+export const restore = async (opts: RestoreOptions) => {
+    const { collectionNames, saveName } = opts;
     try {
+        const restoreDir = saveName
+            ? path.join(DUMP_PATH, `save_${saveName}`, "maven")
+            : path.join(DUMP_PATH, "maven");
+
         if (collectionNames && collectionNames.length > 0) {
             for (const collectionName of collectionNames) {
                 console.log(
@@ -15,7 +26,7 @@ export const restore = async (collectionNames?: string[]) => {
                     `--nsInclude=maven.${collectionName}`,
                     "--drop",
                     "--noOptionsRestore",
-                    `${DUMP_PATH}/maven/${collectionName}.bson`,
+                    `${restoreDir}/${collectionName}.bson`,
                 ]);
                 console.log(chalk.blue(`${collectionName} restored.`));
             }
@@ -25,7 +36,7 @@ export const restore = async (collectionNames?: string[]) => {
                 `--uri=${getLocalConnectionString()}`,
                 "--drop",
                 "--noOptionsRestore",
-                `${DUMP_PATH}/maven`,
+                restoreDir,
             ]);
             console.log(chalk.blue("Database restored."));
         }
